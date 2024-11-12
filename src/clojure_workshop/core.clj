@@ -733,3 +733,7 @@ favorite-fruit
 ;=> {:name "Kiwi", :color "Green", :kcal_per_100g 51, :distinguish_mark "Hairy"}
 
 
+(defn name [hey]
+  (+ 5 hey))
+
+
