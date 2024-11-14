@@ -736,4 +736,215 @@ favorite-fruit
 (defn name [hey]
   (+ 5 hey))
 
+(dissoc favorite-fruit :distinguish_mark)
+; {:name "Kiwi", :color "Green", :kcal_per_100g 61}
 
+(dissoc favorite-fruit :kcal_per_100g :color)
+;=> {:name "Kiwi", :distinguish_mark "Hairy"}
+
+
+;Sets
+;A set is a collection of unique values. Clojure provides HashSet and SortedSet.
+; Hash Sets are implemented as Hash Maps, with the key and the value of each entry being identical.
+
+;Hash Sets are fairly common in Clojure and have a literal notation of  hash with curly braces, #{}, for example:
+
+#{1 2 3 4 5}
+; => #{1 2 3 4 5}
+
+;As with maps, sets cannot have duplicate entries:
+#{:a :a :b :c}
+
+(hash-set :a :b :c :d)
+; #{:c :b :d :a}
+(set [:a :b :c])
+; #{:c :b :a}
+(set ["No" "Copy" "Cats" "Please"])
+; #{"Copy" "Please" "Cats" "No"}
+(sorted-set "No" "Copy" "Cats" "Cats" "Please")
+; #{"Cats" "Copy" "No" "Please"}
+
+;Exercise 2.03: Using Sets
+
+(def supported-currencies #{"Dollar" "Japanese yen" "Euro" "Indian rupee" "British pound"})
+supported-currencies
+;=> #{"Japanese yen" "Indian rupee" "Euro" "Dollar" "British pound"}
+(get supported-currencies "Dollar")
+;=> "Dollar"
+(get supported-currencies "Swiss franc")
+;=> nil
+(contains? supported-currencies "Dollar")
+;=> true
+(contains? supported-currencies "Swiss franc")
+;=> false
+
+;To add an entry to a set, use the conj function, as in "conjoin"
+
+(conj supported-currencies "Monopoly Money")
+;=> #{"Japanese yen" "Indian rupee" "Euro" "Dollar" "Monopoly Money" "British pound"}
+
+(conj supported-currencies "Monopoly Money" "Gold dragon" "Gil" )
+
+(conj supported-currencies "Monopoly Money" "Gold dragon" "Gil")
+;=> #{"Gold dragon" "Japanese yen" "Indian rupee" "Euro" "Dollar" "Monopoly Money" "British pound" "Gil"}
+
+;Remove one or more items with the disj function, as in "disjoin":
+
+(disj supported-currencies "Dollar" "British pound")
+;=> #{"Japanese yen" "Indian rupee" "Euro"}
+
+;Vectors
+;A vector is another type of collection that is widely used in Clojure. You can think of vectors as powerful immutable arrays.
+;They are collections of values efficiently accessible by their integer index (starting from 0)m and they maintain the order of item insertion as well as duplicates.
+;Use a vector when you need to store and read elements in order, and when you don't mind duplicate elements.
+
+[1 2 3]
+;[1 2 3]
+
+;Vectors can also be created with the vector function followed by a list of items
+;as arguments:
+(vector 10 15 2 15 0)
+;=> [10 15 2 15 0]
+
+
+;You can create a vector from another collection using the vec function; for example,
+;the following expression converts a Hash Set to a vector
+
+(vec #{1 2 3})
+;=> [1 3 2]
+
+;As with other collections, vectors also can contain different types of values:
+
+[nil :keyword "String" {:answers [:yep :nope]}]
+;=> [nil :keyword "String" {:answers [:yep :nope]}]
+
+;Exercise 2.04: Using Vectors
+
+(get [:a :b :c] 0)
+;=> :a
+
+(get [:a :b :c] 2)
+;=> :c
+
+;Let's bind a vector to a symbol to make the practice more convenient:
+
+(def fibonacci [0 1 1 2 3 5 8])
+fibonacci
+;=> [0 1 1 2 3 5 8]
+
+(get fibonacci 6)
+;=> 8
+
+(fibonacci 6)
+;=> 8
+
+(conj fibonacci 13 21)
+;=> [0 1 1 2 3 5 8 13 21]
+
+;Data types and Immutability
+;Each item in the Fibonacci sequence corresponds to the sum of the previous two
+
+
+;In the preceding example, we used let to create three local bindings and improve the readability.
+(let [size (count fibonacci)
+      last-number (last fibonacci)
+      second-to-last-number (fibonacci (- size 2))]
+  (conj fibonacci (+ last-number second-to-last-number)))
+;[0 1 1 2 3 5 8 13]
+
+;Lists
+;Lists are sequential collections, similar to vectors, but items are added to the front
+'(1 2 3)
+;=> (1 2 3)
+
+(+ 1 2 3)
+;=> 6
+
+'(+ 1 2 3)
+;=> (+ 1 2 3)
+
+;Lists can also be created with list function:
+(list :a :b :c)
+;=> (:a :b :c)
+
+;To read the first element of a list, use first:
+(first '(:a :b :c :d))
+;=> :a
+
+(rest '(:a :b :c :d))
+;=> (:b :c :d)
+
+;You cannot use the get function with a list to retrieve by index. You could use nth, but it
+;is not efficient as the list is iterated or "walked" until it reaches the desired position:
+
+(nth '(:a :b :c :d) 2)
+; => :c
+
+;Exercise 2.05: Using Lists
+;In this exercise, we will practice using lists by reading and adding elements to
+;a to-do list.
+
+(def my-todo (list "Feed the cat" "Clean the bathroom" "Save the world")
+  )
+my-todo
+;=> ("Feed the cat" "Clean the bathroom" "Save the world")
+
+;You can add items to your list by using the cons function, which operates
+;on sequences:
+
+(cons "Go to work" my-todo)
+;=> ("Go to work" "Feed the cat" "Clean the bathroom" "Save the world")
+
+;Similarly, you can use the conj function, which is used because a list is a collection:
+(conj my-todo "Go to work")
+("Go to work" "Feed the cat" "Clean the bathroom" "Save the world")
+
+
+;You can add items to your list by using the cons function, which operates
+(cons "Go to work" my-todo)
+;=> ("Go to work" "Feed the cat" "Clean the bathroom" "Save the world")
+
+(conj my-todo "My job" "Go to work" "Wash my socks")
+;=> ("Wash my socks" "Go to work" "My job" "Feed the cat" "Clean the bathroom" "Save the world")
+
+(first my-todo)
+;=> "Feed the cat"
+
+(rest my-todo)
+;=> ("Clean the bathroom" "Save the world")
+
+(nth my-todo 2)
+;=> "Save the world"
+
+;Collection and Sequence Abstractions
+;Clojure's data structures are implemented in terms of powerful abstractions. You might
+;have noticed that the operations we used on collections are often similar, but behave
+;differently based on the type of the collection. For instance, get retrieves items from
+;a map with a key, but from a vector with an index; conj adds elements to a vector at the
+;back, but to a list at the front.
+;A sequence is a collection of elements in a particular order, where each item follows another.
+;Maps, sets, vectors, and lists are all collections, but only vectros and lists are sequences, although we can easily obtain a sequence from a map or a set.
+
+
+;Convert a map into a sequence using the seq function:
+(seq language)
+;=> ([:name "Clojure"] [:creator "Rich Hickey"] [:platforms ["Java" "JavaScript" ".NET"]])
+
+
+(seq language)
+;=> ([:name "Clojure"] [:creator "Rich Hickey"] [:platforms ["Java" "JavaScript" ".NET"]])
+(nth (seq language)1)
+
+;=> [:creator "Rich Hickey"]
+language
+;=> {:name "Clojure", :creator "Rich Hickey", :platforms ["Java" "JavaScript" ".NET"]}
+
+;A lot of functions just work on collections directly because they can be turned into
+;a sequence, so you could omit the seq step and, for example, call first, rest, or last
+;directly on a map or a set:
+ (first #{:a :b :c})
+;:c
+ (rest #{:a :b :c})
+;(:b :a)
+;user=> (last language)
+[:platforms ["Java" "JavaScript" ".NET"]]
