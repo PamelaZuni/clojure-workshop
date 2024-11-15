@@ -139,8 +139,8 @@ Functions are invoked according to the following structure:
 (let [x (* 10 3)
       y 20
       z 100]
-     (println message)
-     (+ x y z))
+  (println message)
+  (+ x y z))
 ;Let's add them all!
 ;=> 150
 
@@ -195,11 +195,11 @@ Clojure Meditate v1.0
 ;The doc-string parameter it will allow you to add a description of your function.
 ;The doc-string is not only useful when browsing a project's source code – it also
 ;It is good practice to document the arguments with backticks, `, like we did with
-`x`,
+`x `,
         (defn square
-  "Returns the product of the number `x` with itself"
-  [x]
-  (* x x))
+          "Returns the product of the number `x` with itself"
+          [x]
+          (* x x))
 
 ;The doc-string is not only useful when browsing a projects source code -
 ; it also makes it available to the doc function.
@@ -497,7 +497,7 @@ cat
 ;=> "!!!!! !!!!!!"
 (clojure.string/replace "Hello World2" #"\d" "!")
 ;=> "Hello World!"
-(clojure.string/replace "Hello World2" #"w" (fn [letter] (do (println letter "!"))) )
+(clojure.string/replace "Hello World2" #"w" (fn [letter] (do (println letter "!"))))
 ;=> "Hello World2"
 (clojure.string/replace "Hello World2" #"w" (fn [letter] (do (println letter) "!")))
 ;=> "Hello World2"
@@ -613,10 +613,10 @@ foo
 ;structures and structure information as follows
 
 {
- "David Bowie" {
-                "The Man Who Mapped the World" {:year 1970, :duration "4:01"}
-                "Comma Oddity" {:year 1969, :duration "5:19"}
-                }
+ "David Bowie"       {
+                      "The Man Who Mapped the World" {:year 1970, :duration "4:01"}
+                      "Comma Oddity"                 {:year 1969, :duration "5:19"}
+                      }
  "Crosby Sills Hash" {
                       "Helplessly Mapping" {:year 1969, :duration "2:38"}
                       "Almost Cut My hair" {:year 1979, :duration "4:29", :featuring ["Neil Young", "Rich Hickey"]}
@@ -699,11 +699,11 @@ favorite-fruit
 ;10. If we wanted to add more structured information, we could add a map as a value.
 ;Add production information as a nested map in our Kiwi map:
 
-(assoc favorite-fruit :yearly_production_in_tonnes {:china 2025000 :italy
+(assoc favorite-fruit :yearly_production_in_tonnes {:china              2025000 :italy
                                                     541000 :new_zealand 412000 :iran 311000 :chile 225000})
-{:name "Kiwi", :color "Green", :kcal_per_100g 61, :distinguish_mark "Hairy",
+{:name                        "Kiwi", :color "Green", :kcal_per_100g 61, :distinguish_mark "Hairy",
  :yearly_production_in_tonnes {:china 2025000, :italy 541000, :new_zealand 412000,
-                               :iran 311000, :chile 225000}}
+                               :iran  311000, :chile 225000}}
 ;{:name "Kiwi",
 ; :color "Green",
 ; :kcal_per_100g 61,
@@ -783,7 +783,7 @@ supported-currencies
 (conj supported-currencies "Monopoly Money")
 ;=> #{"Japanese yen" "Indian rupee" "Euro" "Dollar" "Monopoly Money" "British pound"}
 
-(conj supported-currencies "Monopoly Money" "Gold dragon" "Gil" )
+(conj supported-currencies "Monopoly Money" "Gold dragon" "Gil")
 
 (conj supported-currencies "Monopoly Money" "Gold dragon" "Gil")
 ;=> #{"Gold dragon" "Japanese yen" "Indian rupee" "Euro" "Dollar" "Monopoly Money" "British pound" "Gil"}
@@ -933,7 +933,7 @@ my-todo
 
 (seq language)
 ;=> ([:name "Clojure"] [:creator "Rich Hickey"] [:platforms ["Java" "JavaScript" ".NET"]])
-(nth (seq language)1)
+(nth (seq language) 1)
 
 ;=> [:creator "Rich Hickey"]
 language
@@ -942,9 +942,238 @@ language
 ;A lot of functions just work on collections directly because they can be turned into
 ;a sequence, so you could omit the seq step and, for example, call first, rest, or last
 ;directly on a map or a set:
- (first #{:a :b :c})
+(first #{:a :b :c})
 ;:c
- (rest #{:a :b :c})
+(rest #{:a :b :c})
 ;(:b :a)
 ;user=> (last language)
 [:platforms ["Java" "JavaScript" ".NET"]]
+
+;Data Types and Immutability
+
+;INTO
+;into is another useful operator that puts elements of one collection into another
+;collection. The first argument for into is the target collection:
+
+(into [1 2 3 4] #{5 6 7 8})
+;=> [1 2 3 4 7 6 5 8]
+
+
+;The resulting vector is not in ascending order because Hash Sets are not sorted:
+(into #{1 2 3 4} [5 6 7 8])
+;=> #{7 1 4 6 3 2 5 8}
+
+(into #{1 2 3 4} [5 6 7 8])
+;=> #{7 1 4 6 3 2 5 8}
+
+;A usage example would be, for example, to deduplicate a vector, just put it into a set:
+(into #{} [1 2 3 3 3 4])
+;=> #{1 4 3 2}
+
+;To put items into a map, you would need to pass a collection of tuples representing key-value pairs:
+(into {} [[:a 1] [:b 2] [:c 3]])
+;=> {:a 1, :b 2, :c 3}
+
+;Each item is "conjoined" in the collection, and so it follows the semantic of the target collection
+;for inserting items with conj. Elements are added to a list at the front:
+(into '() [1 2 3 4])
+;=> (4 3 2 1)
+
+; (into '() [1 2 3 4]), here is step-by-step representation of what happened:
+(conj '() 1)
+;=> (1)
+
+(conj '(1) 2)
+;=> (2 1)
+
+(conj '(2 1) 3)
+;=> (3 2 1)
+
+(conj '(3 2 1) 4)
+;=> (4 3 2 1)
+
+(conj '(3 2 1) 4)
+;=> (4 3 2 1)
+
+;If you want to concatenate collections, concat might be more appropriate than into.
+
+(concat '(1 2) '(3 4))
+;=> (1 2 3 4)
+
+(into '(1 2) '(3 4))
+;=> (4 3 1 2)
+
+;A lot of Clojure functions that operate on sequences will return sequence no matter
+;what the input type was concat is one example:
+
+(concat #{1 2 3} #{1 2 3 4})
+;=> (1 3 2 1 4 3 2)
+
+(concat {:a 1} ["Hello"])
+;=> ([:a 1] "Hello")
+
+;Sort
+;Sort can rearrange a collection to order its elements. It has the benefit of being slightly more obvious in terms of
+;why you would want a sequence as a result:
+
+(def alphabet #{:a :b :c :d :e :f})
+;=> #'clojure-workshop.core/alphabet
+alphabet
+;=> #{:e :c :b :d :f :a}
+(sort alphabet)
+;=> (:a :b :c :d :e :f)
+
+(sort [3 7 5 1 9])
+;=> (1 3 5 7 9)
+
+;If is needed to have a vector as a result, could use the into function:
+(sort [3 7 5 1 9])
+;=> (1 3 5 7 9)
+(into [] *1)
+;=> [1 3 5 7 9]
+(def numbers (sort [3 4 5 1]))
+;=> (1 3 4 5)
+(into [] numbers)
+;=> [1 3 4 5]
+
+;Conj can also be used on maps. For its arguments to be consistent with other types
+;of collections, the new entry is represented by a tuple:
+
+(conj language [:created 2007])
+;language
+;=> {:name "Clojure", :creator "Rich Hickey", :platforms ["Java" "JavaScript" ".NET"], :created 2007}
+
+;Similarly, a vector is an associative collection of key-value paris where the key is the index of the value:
+(assoc [:a :b :c :d] 2 :z)
+;=> [:a :b :z :d]
+
+;Exercise 2.06: Working with nested Data Structures
+;A pure function is a function where the return value is only determined by its input values.
+;A pure function does not have any side effects, which means that is does not mutate a program's state nor generate any kind of I/O.
+
+;1. Open up a REPL and create the following Hash Map representing the sample gemstone database:
+
+(def gemstone-store-db {
+                        :ruby {
+                               :name       "Ruby"
+                               :stock      480
+                               :sales      [1990 3644 6376 4918 7882 6747 7495 8573 5097 1712]
+                               :properties {
+                                            :dispersion       0.018
+                                            :hardness         9.0
+                                            :refractive-index [1.77 1.78]
+                                            :color            "Red"
+                                            }
+                               }
+                        })
+
+
+{:ruby {:name       "Ruby",
+        :stock      480,
+        :sales      [1990 3644 6376 4918 7882 6747 7495 8573 5097 1712],
+        :properties {:dispersion 0.018, :hardness 9.0, :refractive-index [1.77 1.78], :color "Red"}}}
+
+;One of the most popular questions the shop gets from its customers is about the
+;durability of a gem. This can be found in the properties of a gem, at the :hardness
+;key. The first function that we need to develop is durability, which retrieves the
+;hardness of a given gem.
+
+;2. Use the fet function with the :ruby gem as an example
+(get (get (get gemstone-store-db :ruby) :properties) :hardness)
+;=> 9.0
+
+;3. Use the keyword as a function to see how it improves the readability of our code:
+(:hardness (:properties (:ruby gemstone-store-db)))
+;=> 9.0
+
+;Still there is a better way, for example use the get-in function.
+;It takes a vector of keys as parameters and digs in the map with just one function call.
+
+;4. Use the get-in function with the [:ruby :properties :hardness] vector of parameters to retrieve the deeply
+;nested :hardness key
+
+(get-in gemstone-store-db [:ruby :properties :hardness])
+;=> 9.0
+
+;5. Create the durability function that takes the database and the gem keyword as a parameter
+;and returns the value of the hardness property:
+
+(defn durability [db gemstone]
+  (get-in db [gemstone :properties :hardness]))
+
+(durability gemstone-store-db :ruby)
+;=> 9.0
+
+;7. Write the code to change the color property of a gem. Use assoc:
+(defn gemstone-color [db gemstone]
+  (assoc db [gemstone :properties :color] "Red"))
+
+
+(assoc (:ruby gemstone-store-db) :properties {:color "Near colorless through pink through all shades of red to a deep crimson"})
+;{:name       "Ruby",
+; :stock      480,
+; :sales      [1990 3644 6376 4918 7882 6747 7495 8573 5097 1712],
+; :properties {:color "Near colorless through pink through all shades of red to a deep crimson"}}
+
+
+;8. Use into function to takes a collection and put its values in another collection
+
+(into {:a 1 :b 2} {:c 3})
+;{:a 1 :b 2 :c 3}
+
+;If we use the update function combined with into, we could obtain the desired result.
+(update (:ruby gemstone-store-db) :properties into {:color "Near colorless pink"})
+;=>
+{:name "Ruby",
+ :stock 480,
+ :sales [1990 3644 6376 4918 7882 6747 7495 8573 5097 1712],
+ :properties {:dispersion 0.018,
+              :hardness 9.0,
+              :refractive-index [1.77 1.78],
+              :color "Near colorless through oink through all shades or red to a deep crimson"}}
+;How the into is in that position line 1125 after the properties?
+
+;The combination of update and into is not very readable or easy to understand.
+;Second, we wanted to return the entire database, but it has returned only the "Ruby" entru.
+;As with get-in, Clojure offers a simpler way of dealing with nested maps: assoc-in and update-in.
+;They work like assoc and update, but take a vector of keus (such as get-in) as a parameter, instead of a single key.
+;Use update-in when it is needed to update a deeply nested value with a function
+; (for example, to compute the new value with the previous value) use assoc-in
+;Use assoc-in to change the color property of the ruby gem:
+
+
+;WHY ON THE ASSOC IN IT USES LIKE A VECTOR [] INSTEAD OF MAP {}?
+(assoc-in gemstone-store-db [:ruby :properties :color] "Near colorless through pink")
+
+;=>
+{:ruby {:name "Ruby",
+        :stock 480,
+        :sales [1990 3644 6376 4918 7882 6747 7495 8573 5097 1712],
+        :properties {:dispersion 0.018,
+                     :hardness 9.0,
+                     :refractive-index [1.77 1.78],
+                     :color "Near colorless through pink\nthrough all shades of red to a deep crimson"}}}
+
+
+
+;WHY IT IS NOT USED THE PARAMETER DB? WHY IT TAKES THE [GEMSTONE :PROPERTIES :COLOR] INSIDE THE VECTOR instead of a map?
+(defn change-color [db gemstone new-color]
+  (assoc-in gemstone-store-db [gemstone :properties :color] new-color))
+
+
+(change-color gemstone-store-db :ruby "Some kind of red")
+;=>
+{:ruby {:name "Ruby",
+        :stock 480,
+        :sales [1990 3644 6376 4918 7882 6747 7495 8573 5097 1712],
+        :properties {:dispersion 0.018, :hardness 9.0, :refractive-index [1.77 1.78], :color "Some kind of red"}}}
+
+
+
+;13. We can use the update-in function in combination with dec to decrement (decrease by one) the stock.
+(update-in gemstone-store-db [:ruby :stock] dec)
+;=>
+{:ruby {:name "Ruby",
+        :stock 479,
+        :sales [1990 3644 6376 4918 7882 6747 7495 8573 5097 1712],
+        :properties {:dispersion 0.018, :hardness 9.0, :refractive-index [1.77 1.78], :color "Red"}}}
