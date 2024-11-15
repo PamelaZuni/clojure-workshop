@@ -1158,8 +1158,7 @@ alphabet
 
 ;WHY IT IS NOT USED THE PARAMETER DB? WHY IT TAKES THE [GEMSTONE :PROPERTIES :COLOR] INSIDE THE VECTOR instead of a map?
 (defn change-color [db gemstone new-color]
-  (assoc-in gemstone-store-db [gemstone :properties :color] new-color))
-
+  (assoc-in db [gemstone :properties :color] new-color))
 
 (change-color gemstone-store-db :ruby "Some kind of red")
 ;=>
@@ -1177,3 +1176,61 @@ alphabet
         :stock 479,
         :sales [1990 3644 6376 4918 7882 6747 7495 8573 5097 1712],
         :properties {:dispersion 0.018, :hardness 9.0, :refractive-index [1.77 1.78], :color "Red"}}}
+
+;Creating a Simple in-Memory Database
+;Create a couple of helper functions to help maintain the state of the database in memory:
+
+
+
+;As guidance, we would like the data structure to have this shape:
+
+{:table-1 {:data [] :indexes {}} :table-2 {:data [] :indexes {}}}
+
+{
+ :clients {
+           :data [{:id 1 :name "Bob" :age 30} {:id 2 :name "Alice" :age 24}]
+           :indexes {:id {1 0, 2 1}}
+           },
+ :fruits {
+          :data [{:name "Lemon" :stock 10} {:name "Coconut" :stock 3}]
+          :indexes {:name {"Lemon" 0, "Coconut" 1}}
+          },
+ :purchases {
+             :data [{:id 1 :user-id 1 :item "Coconut"} {:id 1 :user-id 2 :item "Lemon"}]
+             :indexes {:id {1 0, 2 1}}
+             }
+ }
+
+;Storing data and indexes separately allows multiple indexes to be created without having to duplicate the actual data.
+
+;The indexes map stores an association between the index key and its position in the
+;data vector for each index key. In the fruits table, "Lemon" is the first record of the data
+;vector, so the value in the :name index is 0.
+
+(def memory-db (atom {}))
+
+(defn read-db [] @memory-db)
+
+(defn write-db [new-db] (reset! memory-db new-db))
+
+(defn create-table [table-name]
+  )
+
+
+;Functions in Depth
+;Destructuring
+;Destructuring allows you to remove data elements from their structure or disassemble a structure.
+;It is a technique that improves the readability and conciseness of your code by providing a better tool for a widely used pattern.
+;There are two main ways of destructuring data: sequentially (with vectores) and associatively (with maps).
+
+;Imagine that we need to write a function that prints a formatted string given
+;a tuple of coordinates, for example, the tuple [48.9615, 2.4372].
+;We could write the following function:
+
+(defn print-cords [coords]
+  (let [lat (first coords)
+        lon (last coords)]
+    (println (str "Latitude: " lat " - " "Longitute: " lon))))
+
+
+
